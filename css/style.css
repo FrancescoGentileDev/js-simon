@@ -28,3 +28,12 @@ p {
 
 }
 
+#error {
+    color: red;
+    font-size: 3rem;
+}
+
+#correct {
+    color: green;
+    font-size: 3rem;
+}
