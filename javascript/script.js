@@ -34,7 +34,7 @@ function startCountDown() {
 }
 
 
-function showNumbers(array) {
+function showNumbers(array, ) {
     remember.forEach((element, index) => {
     element.innerHTML = array[index];
   });
@@ -42,16 +42,13 @@ function showNumbers(array) {
 
 
 function hideNumbers() {
-  setTimeout(() => {
     remember.forEach((value) => {
       value.innerHTML = "";
     });
-  }, timeToWait * 1000);
 }
 
 
 function getSolution(array) {
-    setTimeout(() => {
         let answerArray = [];
         array.forEach((value, index) => {
             answerArray.push(prompt("inserisci numero"))
@@ -59,7 +56,6 @@ function getSolution(array) {
         console.log(answerArray)
 
         writeResult(answerArray, array)
-  }, timeToWait * 1000);
 }
 /**
  * 
@@ -89,8 +85,8 @@ function writeResult(answers, results) {
     document.getElementById("error").innerHTML = errors;
     correct.forEach((value) => {
         document.getElementById("correct").innerHTML += " " + value
-        showNumbers(results)
     })
+    showNumbers(results)
 
 
 
@@ -98,18 +94,22 @@ function writeResult(answers, results) {
 
 
 
-
 start.addEventListener("click", () => {
-
+    start.setAttribute("disabled", "")
   //INIZIO UN COUNTDOWN CHE AGGIORNA IN PAGINA
     startCountDown();
     
     //CREO UN ARRAY RANDOM E LO ASSEGNO IN PAGINA
-    let arrayRandom = randomNumbers(5, 1, 99);
+    let arrayRandom = randomNumbers(remember.length, 1, 99);
     showNumbers(arrayRandom)
 
   //Nascondo i numeri alla fine del countdown
+    setTimeout(() => {
     hideNumbers();
 
-    let answerArray = getSolution(arrayRandom);
+    setTimeout(() => {
+        let answerArray = getSolution(arrayRandom);
+    }, 500);
+    }, timeToWait * 1000);
+    
 });
