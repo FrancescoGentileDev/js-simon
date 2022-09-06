@@ -1,18 +1,29 @@
 
+:root {
+    --size: 35vw
+}
 
-.background {
+
+.circle-simon {
     background-color: #323232;
-    width: 50vw;
-    height: 50vw;
+    width: var(--size);
+    height: var(--size);
     position: relative;
     border-radius: 50%;
+}
+
+button:hover {
+    background-color: bisque;
+}
+button:active {
+    background-color: rgb(230, 126, 0);
 }
 
 
 .center-circle {
     background-color: #323232;
-    width: 20vw;
-    height: 20vw;
+    width: calc(var(--size) / 3);
+    height: calc(var(--size) / 3);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -23,30 +34,54 @@
 }
 
 .button {
-    width: 25vw;
-    height: 25vw;
+    width: calc(var(--size) / 2);
+    height: calc(var(--size) / 2);
     border: 25px solid #323232
 }
 #buttonGreen {
-    background-color: rgba(0, 128, 0, 0.753);
+    background-color: rgba(0, 128, 0, 0.5);
     border-top-left-radius: 100%;
 }
 #buttonGreen:hover {
-    background-color: rgb(0, 214, 0);
+    background-color: rgba(0, 214, 0, 0.842);
 }
+.buttonGreen-active {
+    background-color: rgb(0, 214, 0) !important;
+}
+
+
 
 #buttonRed {
-    background-color: red;
+    background-color: rgba(206, 0, 0, 0.5);
     border-top-right-radius: 100%;
-  
 }
+#buttonRed:hover {
+    background-color: rgba(255, 0, 0, 0.801);
+}
+.buttonRed-active {
+    background-color: rgb(255, 0, 0) !important;
+}
+
 
 #buttonYellow {
-    background-color: yellow;  
+    background-color: rgba(214, 214, 0,  0.5);  
     border-bottom-left-radius: 100%;
 }
+#buttonYellow:hover {
+    background-color: rgb(255, 255, 0, 0.842); 
+} 
+.buttonYellow-active {
+    background-color: yellow !important; 
+} 
+
 
 #buttonBlue {
-    background-color: blue;
+    background-color: rgba(0, 0, 189,  0.5);
     border-bottom-right-radius: 100%;
+}
+#buttonBlue:hover {
+    background-color: rgb(0, 0, 255, 0.842);
+}
+.buttonBlue-active {
+    background-color: blue !important;
 }
