@@ -1,15 +1,33 @@
-const remember = document.querySelectorAll(".rememberThis");
-const start = document.getElementById("start");
-const countDown = document.querySelector(".counter");
-let timeToWait = 10;
+const buttonStart = document.getElementById("start");
+const color = document.querySelectorAll(".button");
+const audioName = ["a.mp3", "b.mp3", "c.mp3", "d.mp3"];
+let level = 1;
+let score = 0;
 
-/**
- *
- * @param {Number} maxNumber QUANTI ELEMENTI NELL'ARRAY
- * @param {Number} minRange MINIMO NUMERO ESTRATTO
- * @param {Number} maxRange MAX NUMERO ESTRATTO
- * @returns
- */
+let lastButtonClicked = -1;
+
+function enableClick() {
+  color.forEach((value, index) => {
+    value.addEventListener("click", soundButton);
+  });
+}
+function soundButton() {
+  let index;
+  color.forEach((value, key) => {
+    if (this == value) index = key;
+  });
+  const audio = new Audio(`audio/${audioName[index]}`);
+  audio.play();
+  lastButtonClicked = index;
+}
+
+function disableClick() {
+  color.forEach((value, index) => {
+    value.removeEventListener("click", soundButton);
+  });
+}
+enableClick();
+
 function randomNumbers(maxNumber, minRange, maxRange) {
   let array = [];
   for (let index = 0; index < maxNumber; index++) {
@@ -19,97 +37,85 @@ function randomNumbers(maxNumber, minRange, maxRange) {
   return array;
 }
 
-function startCountDown() {
-  let counter = timeToWait;
-  const reference = setInterval(() => {
-    counter--;
-    countDown.innerHTML = counter;
-    console.log(counter);
-    if (counter === 0) {
-      clearInterval(reference);
-    }
-  }, 1000);
+function setScore(number) {
+    number > 0 ? score += 20 : score -= 20;
 
-  return reference;
+    document.querySelector("#score p").innerHTML = score;
 }
 
 
-function showNumbers(array, ) {
-    remember.forEach((element, index) => {
-    element.innerHTML = array[index];
-  });
-}
+async function startGame() {
+  while (level < 10) {
+    let score = await startLevel();
+    console.log("FINE DEL LIVELLO", level);
 
-
-function hideNumbers() {
-    remember.forEach((value) => {
-      value.innerHTML = "";
+    let levelUp = await new Promise((resolve) => {
+      setTimeout(() => {
+        document.querySelector("#level p").innerHTML = level + 1;
+        resolve(level++);
+      }, 2000);
     });
+  }
 }
 
+async function startLevel() {
+  let difficulty = level;
+  let score = 0;
+  const remember = randomNumbers(difficulty, 0, 4);
 
-function getSolution(array) {
-        let answerArray = [];
-        array.forEach((value, index) => {
-            answerArray.push(prompt("inserisci numero"))
-        })
-        console.log(answerArray)
+  while (difficulty > 0) {
+    await glowButton(difficulty, remember[difficulty - 1]);
+    difficulty--;
+  }
+  difficulty = level;
 
-        writeResult(answerArray, array)
-}
-/**
- * 
- * @param {Array} answers 
- * @param {Array} results 
- */
-function writeResult(answers, results) {
-    console.log("risposte:", answers, "soluzioni :", results )
-    let correct = [];
-    let errors = 0;
-
-    for (let i = 0; i < results.length; i++) {
-        let current = results[i].toString()
-        console.log("current", current)
-        
-        if (answers.includes(current)) {
-            console.log("ENTRATO IF")
-            correct.push(current)
-        }
-        else {
-            console.log("ENTRATO ELSE")
-            errors++
-        }
-    }
-    
-    console.log(errors, correct)
-    document.getElementById("error").innerHTML = errors;
-    correct.forEach((value) => {
-        document.getElementById("correct").innerHTML += " " + value
-    })
-    showNumbers(results)
-
-
-
+  await userChoice(difficulty, remember);
 }
 
-
-
-start.addEventListener("click", () => {
-    start.setAttribute("disabled", "")
-  //INIZIO UN COUNTDOWN CHE AGGIORNA IN PAGINA
-    startCountDown();
-    
-    //CREO UN ARRAY RANDOM E LO ASSEGNO IN PAGINA
-    let arrayRandom = randomNumbers(remember.length, 1, 99);
-    showNumbers(arrayRandom)
-
-  //Nascondo i numeri alla fine del countdown
-    setTimeout(() => {
-    hideNumbers();
+async function glowButton(difficulty, buttonToGlow) {
+  console.log(buttonToGlow);
+  let promise = new Promise((resolve) => {
+    const id = color[buttonToGlow].id;
+    const audio = new Audio(`audio/${audioName[buttonToGlow]}`);
 
     setTimeout(() => {
-        let answerArray = getSolution(arrayRandom);
+      color[buttonToGlow].classList.add(id + "-active");
+      audio.play();
+      setTimeout(() => {
+        resolve(color[buttonToGlow].classList.remove(id + "-active"));
+      }, 1000);
     }, 500);
-    }, timeToWait * 1000);
+  });
+  return promise;
+}
+
+async function userChoice(difficulty, rightSequence) {
+   rightSequence= rightSequence.reverse()
+  let promise = new Promise(async (resolve) => {
     
+    enableClick();
+      for (number of rightSequence) {
+    lastButtonClicked = -1;
+      while (lastButtonClicked === -1) {
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(console.log(lastButtonClicked));
+          }, 200);
+        });
+        }
+          if (lastButtonClicked === number) {
+              setScore(20)
+          }
+          else {
+              setScore(-20)
+          }
+      }
+      resolve(true)
+  });
+  return promise;
+}
+
+buttonStart.addEventListener("click", () => {
+  buttonStart.setAttribute("disabled", "");
+  startGame();
 });

@@ -1,6 +1,6 @@
 
 :root {
-    --size: 35vw
+    --size: 600px
 }
 
 
@@ -84,4 +84,17 @@ button:active {
 }
 .buttonBlue-active {
     background-color: blue !important;
+}
+
+
+@media screen {
+    @media (max-width: 600px) {
+        
+:root {
+    --size: 300px
+}
+.button {
+    border-width: 10px;
+}
+    }
 }
