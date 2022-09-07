@@ -1,34 +1,83 @@
 const buttonStart = document.getElementById("start");
 const color = document.querySelectorAll(".button");
 const audioName = ["a.mp3", "b.mp3", "c.mp3", "d.mp3"];
-let level = 1;
-let score = 0;
-let remember = [];
 
 let lastButtonClicked = -1;
 
+
+class Play {
+  constructor() {
+    this.level = 1;
+    this.score = 0;
+    this.remember = []
+  }
+
+  setLevel(number = 0) {
+    document.querySelector("#level p").innerHTML = number + 1;
+  }
+  setScore(number) {
+    if (number > 0) partita.score += 20;
+    else if (number < 0) partita.score -= 20;
+    else partita.score = 0;
+  
+    document.querySelector("#score p").innerHTML = partita.score;
+  }
+
+}
+
+
+
+let partita;
+
+enableClick()
+
+
+
+/**
+ * Enable click on colored Button
+ */
 function enableClick() {
   color.forEach((value, index) => {
-    value.addEventListener("click", soundButton);
+    value.addEventListener("click", colorClickEvent);
   });
 }
-function soundButton() {
+
+/**
+ * When click a button, sound is played, and variable "lastbuttonclicked" is updated
+ */
+function colorClickEvent() {
   let index;
   color.forEach((value, key) => {
     if (this == value) index = key;
   });
   const audio = new Audio(`audio/${audioName[index]}`);
   audio.play();
+  color[index].classList.add(this.id + "-active");
+  setTimeout(() => {
+    color[index].classList.remove(this.id + "-active");
+  }, 700);
+
+
   lastButtonClicked = index;
 }
 
+
+/**
+ * Disable click on colored Button
+ */
 function disableClick() {
   color.forEach((value, index) => {
-    value.removeEventListener("click", soundButton);
+    value.removeEventListener("click", colorClickEvent);
   });
 }
-enableClick();
 
+/**
+ * Return an array with random numbers
+ * @param {Number} maxNumber array length
+ * @param {Number} minRange min random number
+ * @param {Number} maxRange max random number
+ * @returns 
+ */
 function randomNumbers(maxNumber, minRange, maxRange) {
   let array = [];
   for (let index = 0; index < maxNumber; index++) {
@@ -37,60 +86,68 @@ function randomNumbers(maxNumber, minRange, maxRange) {
 
   return array;
 }
-
+/**
+ * Return a random number
+ * @param {*} minRange min random number
+ * @param {*} maxRange max random number
+ * @returns 
+ */
 const getSingleRandomNumber = (minRange, maxRange) =>
   Math.floor(Math.random() * maxRange) + minRange;
 
-function setScore(number) {
-  if (number > 0) score += 20;
-  else if (number < 0) score -= 20;
-  else score = 0;
 
-  document.querySelector("#score p").innerHTML = score;
-}
 
-function setLevel(number = 0) {
-  document.querySelector("#level p").innerHTML = number + 1;
-}
-
+/**
+ * Start the game 
+ * @returns 
+ */
 async function startGame() {
-  while (level <= 10) {
-    let score = await startLevel();
-    console.log("FINE DEL LIVELLO", level);
 
+  while (partita.level <= 10) {
+
+    
+    await startLevel();
+    console.log("FINE DEL LIVELLO", partita.level);
+
+    //WAIT FEW SECOND BEFORE START NEW LEVEL
     let levelUp = await new Promise((resolve) => {
-      if (level !== 10) {
+      if (partita.level !== 10) {
         setTimeout(() => {
-          resolve(setLevel(level++));
+          resolve(partita.setLevel(partita.level++));
         }, 2000);
       } else {
 
-        resolve(level++);
+        resolve(partita.level++);
       }
     });
   }
   return true;
 }
 
+/**
+ * Start a level 
+ */
 async function startLevel() {
-  let difficulty = level;
-  let score = 0;
+  let counter = partita.level;
   let random = getSingleRandomNumber(0, 4);
-  remember.push(random);
+  partita.remember.push(random);
 
-  let reverseArray = remember.reverse();
-  console.log(remember);
-  while (difficulty > 0) {
-    await glowButton(difficulty, reverseArray[difficulty - 1]);
-    difficulty--;
+  let reverseArray = partita.remember.reverse();
+  console.log(partita.remember);
+  while (counter > 0) {
+    await glowButton(reverseArray[counter - 1]);
+    counter--;
   }
-  difficulty = level;
-
-  await userChoice(difficulty, remember);
+  await userChoice(partita.remember);
 }
 
-async function glowButton(difficulty, buttonToGlow) {
+/**
+ * Glow a button and play a note for it
+ * @param {Number} buttonToGlow A number in range 1,3 to glow button
+ */
+async function glowButton(buttonToGlow) {
   console.log(buttonToGlow);
+
   let promise = new Promise((resolve) => {
     disableClick()
     const id = color[buttonToGlow].id;
@@ -101,40 +158,53 @@ async function glowButton(difficulty, buttonToGlow) {
       audio.play();
       setTimeout(() => {
         resolve(color[buttonToGlow].classList.remove(id + "-active"));
-      }, 1000);
-    }, 500);
+      }, 1000); //first timeout for glow on
+    }, 500); //second timeout for wait before next button in sequence
   });
   return promise;
 }
 
-async function userChoice(difficulty, rightSequence) {
+/**
+ * for passed array wait user interaction and calculate score
+ * @param {Array} rightSequence the right sequence to guess
+ */
+async function userChoice(rightSequence) {
   rightSequence = rightSequence.reverse();
   let promise = new Promise(async (resolve) => {
     enableClick();
     for (number of rightSequence) {
       lastButtonClicked = -1;
+
+      // while user not interact infinite loop
       while (lastButtonClicked === -1) {
+
+        //this is only for slow array
         await new Promise((resolve) => {
           setTimeout(() => {
             resolve(console.log(lastButtonClicked));
           }, 200);
         });
+
+
       }
       if (lastButtonClicked === number) {
-        setScore(20);
+        partita.setScore(20);
       } else {
-        setScore(-20);
+        partita.setScore(-20);
       }
     }
+    disableClick()
     resolve(true);
   });
   return promise;
 }
 
+
+
+
+
 buttonStart.addEventListener("click", async () => {
-  setScore(0);
-  setLevel();
-  remember = []
+  partita = new Play()
 
   buttonStart.setAttribute("disabled", "");
   let start = await startGame();
