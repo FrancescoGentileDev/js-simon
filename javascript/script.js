@@ -15,7 +15,7 @@ class Play {
   setLevel(number = 0) {
     document.querySelector("#level p").innerHTML = number + 1;
   }
-  setScore(number) {
+  setScore(number = 0) {
     if (number > 0) partita.score += 20;
     else if (number < 0) partita.score -= 20;
     else partita.score = 0;
@@ -205,6 +205,8 @@ async function userChoice(rightSequence) {
 
 buttonStart.addEventListener("click", async () => {
   partita = new Play()
+  partita.setLevel()
+  partita.setScore()
 
   buttonStart.setAttribute("disabled", "");
   let start = await startGame();

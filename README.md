@@ -1,5 +1,5 @@
 # SIMON!
-This is reproduction of simon. A little game project in this reproduction of simon.
+This is reproduction of simon. A little game project.
 
 ## Live preview available:  
 https://francescogentiledev.github.io/js-simon/
