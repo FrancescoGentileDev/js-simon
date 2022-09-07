@@ -92,6 +92,7 @@ async function startLevel() {
 async function glowButton(difficulty, buttonToGlow) {
   console.log(buttonToGlow);
   let promise = new Promise((resolve) => {
+    disableClick()
     const id = color[buttonToGlow].id;
     const audio = new Audio(`audio/${audioName[buttonToGlow]}`);
 
