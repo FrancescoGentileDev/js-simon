@@ -3,6 +3,7 @@ const color = document.querySelectorAll(".button");
 const audioName = ["a.mp3", "b.mp3", "c.mp3", "d.mp3"];
 let level = 1;
 let score = 0;
+let remember = [];
 
 let lastButtonClicked = -1;
 
@@ -37,34 +38,50 @@ function randomNumbers(maxNumber, minRange, maxRange) {
   return array;
 }
 
-function setScore(number) {
-    number > 0 ? score += 20 : score -= 20;
+const getSingleRandomNumber = (minRange, maxRange) =>
+  Math.floor(Math.random() * maxRange) + minRange;
 
-    document.querySelector("#score p").innerHTML = score;
+function setScore(number) {
+  if (number > 0) score += 20;
+  else if (number < 0) score -= 20;
+  else score = 0;
+
+  document.querySelector("#score p").innerHTML = score;
 }
 
+function setLevel(number = 0) {
+  document.querySelector("#level p").innerHTML = number + 1;
+}
 
 async function startGame() {
-  while (level < 10) {
+  while (level <= 10) {
     let score = await startLevel();
     console.log("FINE DEL LIVELLO", level);
 
     let levelUp = await new Promise((resolve) => {
-      setTimeout(() => {
-        document.querySelector("#level p").innerHTML = level + 1;
+      if (level !== 10) {
+        setTimeout(() => {
+          resolve(setLevel(level++));
+        }, 2000);
+      } else {
+
         resolve(level++);
-      }, 2000);
+      }
     });
   }
+  return true;
 }
 
 async function startLevel() {
   let difficulty = level;
   let score = 0;
-  const remember = randomNumbers(difficulty, 0, 4);
+  let random = getSingleRandomNumber(0, 4);
+  remember.push(random);
 
+  let reverseArray = remember.reverse();
+  console.log(remember);
   while (difficulty > 0) {
-    await glowButton(difficulty, remember[difficulty - 1]);
+    await glowButton(difficulty, reverseArray[difficulty - 1]);
     difficulty--;
   }
   difficulty = level;
@@ -90,32 +107,35 @@ async function glowButton(difficulty, buttonToGlow) {
 }
 
 async function userChoice(difficulty, rightSequence) {
-   rightSequence= rightSequence.reverse()
+  rightSequence = rightSequence.reverse();
   let promise = new Promise(async (resolve) => {
-    
     enableClick();
-      for (number of rightSequence) {
-    lastButtonClicked = -1;
+    for (number of rightSequence) {
+      lastButtonClicked = -1;
       while (lastButtonClicked === -1) {
         await new Promise((resolve) => {
           setTimeout(() => {
             resolve(console.log(lastButtonClicked));
           }, 200);
         });
-        }
-          if (lastButtonClicked === number) {
-              setScore(20)
-          }
-          else {
-              setScore(-20)
-          }
       }
-      resolve(true)
+      if (lastButtonClicked === number) {
+        setScore(20);
+      } else {
+        setScore(-20);
+      }
+    }
+    resolve(true);
   });
   return promise;
 }
 
-buttonStart.addEventListener("click", () => {
+buttonStart.addEventListener("click", async () => {
+  setScore(0);
+  setLevel();
+  remember = []
+
   buttonStart.setAttribute("disabled", "");
-  startGame();
+  let start = await startGame();
+  buttonStart.removeAttribute("disabled", "");
 });
